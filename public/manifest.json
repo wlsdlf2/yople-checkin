@@ -11,7 +11,8 @@
     {
       "src": "/icon.png",
       "sizes": "720x720",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
