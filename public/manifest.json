@@ -1,0 +1,17 @@
+{
+  "name": "출석 체크",
+  "short_name": "출석 체크",
+  "description": "젊은백성 출석 체크 키패드",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#15803d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
