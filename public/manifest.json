@@ -1,6 +1,6 @@
 {
-  "name": "출석 체크",
-  "short_name": "출석 체크",
+  "name": "젊은백성 출석체크",
+  "short_name": "젊은백성 출석체크",
   "description": "젊은백성 출석 체크 키패드",
   "start_url": "/",
   "display": "standalone",
@@ -10,7 +10,12 @@
   "icons": [
     {
       "src": "/favicon.png",
-      "sizes": "any",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
