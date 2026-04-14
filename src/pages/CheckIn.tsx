@@ -61,15 +61,15 @@ export default function CheckIn() {
     try {
       const { error } = await supabase.from('visitors').insert({ date: today })
       if (error) {
-        showMsg('error', '방문자 등록에 실패했습니다.')
+        showMsg('error', '방문자 출석에 실패했습니다.')
         return
       }
-      showMsg('success', '방문자로 등록되었습니다.')
+      showMsg('success', '방문자로 출석되었습니다.')
       setDigits('')
       setMatches([])
       setShowVisitor(false)
     } catch {
-      showMsg('error', '방문자 등록에 실패했습니다.')
+      showMsg('error', '방문자 출석에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -93,7 +93,6 @@ export default function CheckIn() {
       const list = (data ?? []) as Member[]
       if (list.length === 0) {
         setShowVisitor(true)
-        setMessage({ type: 'info', text: '등록된 번호가 없습니다. 방문자로 등록할까요?' })
       } else if (list.length === 1) {
         await recordAttendance(list[0].id, list[0].name)
       } else {
@@ -146,7 +145,7 @@ export default function CheckIn() {
           {digits.padEnd(4, '·')}
         </div>
 
-        {message && (
+        {message && !showVisitor && (
           <p
             className={`text-center text-lg font-medium mb-4 rounded-xl py-3 px-4 ${
               message.type === 'success'
@@ -178,14 +177,33 @@ export default function CheckIn() {
         )}
 
         {showVisitor && (
-          <button
-            type="button"
-            disabled={loading}
-            onClick={recordVisitor}
-            className="w-full min-h-[56px] rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark active:scale-[0.99] disabled:opacity-50 mb-4"
-          >
-            방문자로 등록
-          </button>
+          <div className="mb-4 rounded-2xl bg-white shadow-md overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100">
+              <p className="text-center text-base font-semibold text-slate-700">
+                등록된 번호가 없습니다
+              </p>
+            </div>
+            <div className="px-4 py-3 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-700 mb-1">처음 오셨나요?</p>
+              <p className="text-sm text-slate-500">
+                오른쪽 새가족 등록처로 오시면 안내드리겠습니다.
+              </p>
+            </div>
+            <div className="px-4 py-3">
+              <p className="text-sm font-semibold text-slate-700 mb-1">등록 없이 방문하셨나요?</p>
+              <p className="text-sm text-slate-500 mb-3">
+                아래 버튼을 눌러 출석해 주세요.
+              </p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={recordVisitor}
+                className="w-full min-h-[52px] rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark active:scale-[0.99] disabled:opacity-50"
+              >
+                방문자로 출석
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
