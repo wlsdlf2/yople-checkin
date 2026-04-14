@@ -141,8 +141,12 @@ export default function CheckIn() {
       )}
 
       <div className="w-full max-w-sm mb-6 sm:mb-8">
-        <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center text-2xl sm:text-3xl font-mono tracking-[0.4em] text-slate-800 mb-4">
-          {digits.padEnd(4, '·')}
+        <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 text-2xl sm:text-3xl font-mono mb-4">
+          {Array.from({ length: 4 }, (_, i) => (
+            <span key={i} className={digits[i] ? 'text-slate-800' : 'text-slate-300'}>
+              {digits[i] ?? '_'}
+            </span>
+          ))}
         </div>
 
         {message && !showVisitor && (
