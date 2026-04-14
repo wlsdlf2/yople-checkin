@@ -59,7 +59,9 @@ export default function CheckIn() {
     const today = todayString()
     setLoading(true)
     try {
-      const { error } = await supabase.from('visitors').insert({ date: today })
+      const { data: existing } = await supabase.from('visitors').select('count').eq('date', today).maybeSingle()
+      const newCount = (existing?.count ?? 0) + 1
+      const { error } = await supabase.from('visitors').upsert({ date: today, count: newCount }, { onConflict: 'date' })
       if (error) {
         showMsg('error', '방문자 출석에 실패했습니다.')
         return
