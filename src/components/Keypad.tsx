@@ -55,11 +55,6 @@ export function Keypad({ value, onChange, maxLength = 4, disabled = false, onRes
       className="min-h-[80px] sm:min-h-[88px] w-full rounded-2xl bg-white text-slate-800 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex flex-col items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50"
     >
       <span className="text-3xl sm:text-4xl font-semibold leading-none">{item.digit}</span>
-      {item.letters && (
-        <span className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5 tracking-wider uppercase">
-          {item.letters}
-        </span>
-      )}
     </button>
   )
 
