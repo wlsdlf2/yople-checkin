@@ -26,8 +26,9 @@ function triggerBirthdayConfetti() {
 }
 
 function todayString(): string {
-  const d = new Date()
-  return d.toISOString().slice(0, 10)
+  // KST(UTC+9) 기준 날짜 반환 — toISOString()은 UTC 기준이라 자정 전후 날짜가 어긋남
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  return kst.toISOString().slice(0, 10)
 }
 
 export default function CheckIn() {
