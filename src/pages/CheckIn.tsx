@@ -129,21 +129,10 @@ export default function CheckIn() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col items-center justify-center p-6 sm:p-8">
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">출석 체크</h1>
-      <p className="text-slate-600 mb-4">전화번호 뒷 4자리를 입력하세요</p>
-
-      {!showVisitor && (
-        <button
-          type="button"
-          disabled={loading}
-          onClick={recordVisitor}
-          className="w-full max-w-sm min-h-[52px] rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark active:scale-[0.99] disabled:opacity-50 mb-6"
-        >
-          방문자로 출석
-        </button>
-      )}
+      <p className="text-slate-600 text-xl mb-4">전화번호 뒷 4자리를 입력하세요</p>
 
       <div className="w-full max-w-sm mb-6 sm:mb-8">
-        <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 text-2xl sm:text-3xl font-mono mb-4">
+        <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 text-2xl sm:text-3xl font-mono mb-0">
           {Array.from({ length: 4 }, (_, i) => (
             <span key={i} className={digits[i] ? 'text-slate-800' : 'text-slate-300'}>
               {digits[i] ?? '_'}
@@ -166,7 +155,7 @@ export default function CheckIn() {
         )}
 
         {matches.length > 1 && (
-          <div className="mb-4 space-y-2">
+          <div className="mb-0 space-y-2">
             <p className="text-slate-600 text-sm font-medium mb-2">본인을 선택하세요</p>
             {matches.map((m) => (
               <button
@@ -183,7 +172,7 @@ export default function CheckIn() {
         )}
 
         {showVisitor && (
-          <div className="mb-4 rounded-2xl bg-white shadow-md overflow-hidden">
+          <div className="mb-0 rounded-2xl bg-white shadow-md overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-100">
               <p className="text-center text-base font-semibold text-slate-700">
                 등록된 번호가 없습니다
@@ -214,6 +203,18 @@ export default function CheckIn() {
       </div>
 
       <Keypad value={digits} onChange={handleDigitsChange} maxLength={4} disabled={loading} onReset={handleReset} />
+
+      {!showVisitor && (
+        <button
+          type="button"
+          disabled={loading}
+          onClick={recordVisitor}
+          className="w-full max-w-sm min-h-[52px] rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark active:scale-[0.99] disabled:opacity-50 mt-6 mb-6"
+        >
+          방문자로 출석
+        </button>
+      )}
+
     </div>
   )
 }
