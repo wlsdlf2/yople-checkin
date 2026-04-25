@@ -1,8 +1,29 @@
 import { useState, useCallback } from 'react'
+import confetti from 'canvas-confetti'
 import { Keypad } from '../components/Keypad'
 import { supabase } from '../lib/supabase'
 
-type Member = { id: string; name: string; phone: string }
+type Member = { id: string; name: string; phone: string; birth_date: string | null }
+
+function isBirthdayThisWeek(birthDate: string | null): boolean {
+  if (!birthDate) return false
+  const today = new Date()
+  const dow = today.getDay()
+  const weekStart = new Date(today)
+  weekStart.setDate(today.getDate() - dow)
+  const [, bMonth, bDay] = birthDate.split('-').map(Number)
+  for (let i = 0; i <= 6; i++) {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    if (d.getMonth() + 1 === bMonth && d.getDate() === bDay) return true
+  }
+  return false
+}
+
+function triggerBirthdayConfetti() {
+  confetti({ particleCount: 100, angle: 45, spread: 40, origin: { x: 0.1, y: 0.75 }, startVelocity: 45 })
+  confetti({ particleCount: 100, angle: 135, spread: 40, origin: { x: 0.9, y: 0.75 }, startVelocity: 45 })
+}
 
 function todayString(): string {
   const d = new Date()
@@ -31,7 +52,7 @@ export default function CheckIn() {
     clearAfterDelay()
   }, [clearAfterDelay])
 
-  const recordAttendance = useCallback(async (memberId: string, memberName: string) => {
+  const recordAttendance = useCallback(async (memberId: string, memberName: string, birthDate?: string | null) => {
     const today = todayString()
     try {
       const { error } = await supabase.from('attendances').insert({
@@ -46,7 +67,12 @@ export default function CheckIn() {
         }
         return
       }
-      showMsg('success', `${memberName}님 출석 완료`)
+      if (isBirthdayThisWeek(birthDate ?? null)) {
+        triggerBirthdayConfetti()
+        showMsg('success', `🎂 ${memberName}님, 생일 축하해요! 출석 완료`)
+      } else {
+        showMsg('success', `${memberName}님 출석 완료`)
+      }
       setMatches([])
       setDigits('')
       setShowVisitor(false)
@@ -85,7 +111,7 @@ export default function CheckIn() {
     try {
       const { data, error } = await supabase
         .from('members')
-        .select('id, name, phone')
+        .select('id, name, phone, birth_date')
         .ilike('phone', `%${fourDigits}`)
 
       if (error) {
@@ -96,7 +122,7 @@ export default function CheckIn() {
       if (list.length === 0) {
         setShowVisitor(true)
       } else if (list.length === 1) {
-        await recordAttendance(list[0].id, list[0].name)
+        await recordAttendance(list[0].id, list[0].name, list[0].birth_date)
       } else {
         setMatches(list)
         setMessage(null)
@@ -131,7 +157,7 @@ export default function CheckIn() {
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">출석 체크</h1>
       <p className="text-slate-600 text-xl mb-4">전화번호 뒷 4자리를 입력하세요</p>
 
-      <div className="w-full max-w-sm mb-6 sm:mb-8">
+      <div className="w-full max-w-sm mb-3 sm:mb-4">
         <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 text-2xl sm:text-3xl font-mono mb-0">
           {Array.from({ length: 4 }, (_, i) => (
             <span key={i} className={digits[i] ? 'text-slate-800' : 'text-slate-300'}>
@@ -142,7 +168,7 @@ export default function CheckIn() {
 
         {message && !showVisitor && (
           <p
-            className={`text-center text-lg font-medium mb-4 rounded-xl py-3 px-4 ${
+            className={`text-center text-lg font-medium mt-4 mb-1 rounded-xl py-3 px-4 ${
               message.type === 'success'
                 ? 'bg-green-100 text-primary-dark'
                 : message.type === 'error'
@@ -155,14 +181,14 @@ export default function CheckIn() {
         )}
 
         {matches.length > 1 && (
-          <div className="mb-0 space-y-2">
+          <div className="mt-2 mb-0 space-y-2">
             <p className="text-slate-600 text-sm font-medium mb-2">본인을 선택하세요</p>
             {matches.map((m) => (
               <button
                 key={m.id}
                 type="button"
                 disabled={loading}
-                onClick={() => recordAttendance(m.id, m.name)}
+                onClick={() => recordAttendance(m.id, m.name, m.birth_date)}
                 className="w-full min-h-[56px] rounded-xl bg-white border-2 border-slate-200 text-lg font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-50"
               >
                 {m.name}
