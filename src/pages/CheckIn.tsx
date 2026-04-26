@@ -3,7 +3,14 @@ import confetti from 'canvas-confetti'
 import { Keypad } from '../components/Keypad'
 import { supabase } from '../lib/supabase'
 
-type Member = { id: string; name: string; phone: string; birth_date: string | null }
+type AnyMember = {
+  id: string
+  name: string
+  phone: string
+  birth_date: string | null
+  source: 'member' | 'pastoral'
+  role?: string | null
+}
 
 function isBirthdayThisWeek(birthDate: string | null): boolean {
   if (!birthDate) return false
@@ -34,7 +41,7 @@ function todayString(): string {
 export default function CheckIn() {
   const [digits, setDigits] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
-  const [matches, setMatches] = useState<Member[]>([])
+  const [matches, setMatches] = useState<AnyMember[]>([])
   const [loading, setLoading] = useState(false)
   const [showVisitor, setShowVisitor] = useState(false)
 
@@ -53,11 +60,12 @@ export default function CheckIn() {
     clearAfterDelay()
   }, [clearAfterDelay])
 
-  const recordAttendance = useCallback(async (memberId: string, memberName: string, birthDate?: string | null) => {
+  const recordAttendance = useCallback(async (member: AnyMember) => {
     const today = todayString()
+    const table = member.source === 'pastoral' ? 'pastoral_attendances' : 'attendances'
     try {
-      const { error } = await supabase.from('attendances').insert({
-        member_id: memberId,
+      const { error } = await supabase.from(table).insert({
+        member_id: member.id,
         date: today,
       })
       if (error) {
@@ -68,11 +76,11 @@ export default function CheckIn() {
         }
         return
       }
-      if (isBirthdayThisWeek(birthDate ?? null)) {
+      if (isBirthdayThisWeek(member.birth_date)) {
         triggerBirthdayConfetti()
-        showMsg('success', `🎂 ${memberName}님, 생일 축하해요! 출석 완료`)
+        showMsg('success', `🎂 ${member.name}님, 생일 축하해요! 출석 완료`)
       } else {
-        showMsg('success', `${memberName}님 출석 완료`)
+        showMsg('success', `${member.name}님 출석 완료`)
       }
       setMatches([])
       setDigits('')
@@ -110,20 +118,29 @@ export default function CheckIn() {
     setMatches([])
     setShowVisitor(false)
     try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('id, name, phone, birth_date')
-        .ilike('phone', `%${fourDigits}`)
+      const [{ data: memberData, error: err1 }, { data: pastoralData, error: err2 }] = await Promise.all([
+        supabase.from('members').select('id, name, phone, birth_date').ilike('phone', `%${fourDigits}`),
+        supabase.from('pastoral_team').select('id, name, phone, role, birth_date').ilike('phone', `%${fourDigits}`),
+      ])
 
-      if (error) {
+      if (err1 || err2) {
         showMsg('error', '조회에 실패했습니다.')
         return
       }
-      const list = (data ?? []) as Member[]
+      const list: AnyMember[] = [
+        ...((memberData ?? []) as { id: string; name: string; phone: string; birth_date: string | null }[]).map((m) => ({
+          ...m,
+          source: 'member' as const,
+        })),
+        ...((pastoralData ?? []) as { id: string; name: string; phone: string; role: string | null; birth_date: string | null }[]).map((m) => ({
+          ...m,
+          source: 'pastoral' as const,
+        })),
+      ]
       if (list.length === 0) {
         setShowVisitor(true)
       } else if (list.length === 1) {
-        await recordAttendance(list[0].id, list[0].name, list[0].birth_date)
+        await recordAttendance(list[0])
       } else {
         setMatches(list)
         setMessage(null)
@@ -189,10 +206,10 @@ export default function CheckIn() {
                 key={m.id}
                 type="button"
                 disabled={loading}
-                onClick={() => recordAttendance(m.id, m.name, m.birth_date)}
+                onClick={() => recordAttendance(m)}
                 className="w-full min-h-[56px] rounded-xl bg-white border-2 border-slate-200 text-lg font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-50"
               >
-                {m.name}
+                {m.name}{m.role ? ` (${m.role})` : ''}
               </button>
             ))}
           </div>
