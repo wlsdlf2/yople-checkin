@@ -248,17 +248,6 @@ export default function CheckIn() {
 
       <Keypad value={digits} onChange={handleDigitsChange} maxLength={4} disabled={loading} onReset={handleReset} />
 
-      {!showVisitor && (
-        <button
-          type="button"
-          disabled={loading}
-          onClick={recordVisitor}
-          className="w-full max-w-sm min-h-[52px] rounded-xl bg-primary text-white text-lg font-semibold hover:bg-primary-dark active:scale-[0.99] disabled:opacity-50 mt-6 mb-6"
-        >
-          방문자로 출석
-        </button>
-      )}
-
     </div>
   )
 }
