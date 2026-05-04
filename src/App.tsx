@@ -11,10 +11,7 @@ function App() {
 
   useEffect(() => {
     const init = async () => {
-      const { data, error } = await supabase
-        .from('app_settings')
-        .select('key, value')
-        .in('key', ['lock_enabled', 'lock_password_hash'])
+      const { data, error } = await supabase.rpc('get_kiosk_settings')
 
       if (error || !data) {
         setAppState('unlocked')
