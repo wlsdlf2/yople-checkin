@@ -62,18 +62,18 @@ export default function CheckIn() {
 
   const recordAttendance = useCallback(async (member: AnyMember) => {
     const today = todayString()
-    const table = member.source === 'pastoral' ? 'pastoral_attendances' : 'attendances'
     try {
-      const { error } = await supabase.from(table).insert({
-        member_id: member.id,
-        date: today,
+      const { data, error } = await supabase.rpc('record_attendance', {
+        p_member_id: member.id,
+        p_source: member.source,
+        p_date: today,
       })
       if (error) {
-        if (error.code === '23505') {
-          showMsg('info', '이미 오늘 출석 처리되었습니다.')
-        } else {
-          showMsg('error', '출석 처리에 실패했습니다.')
-        }
+        showMsg('error', '출석 처리에 실패했습니다.')
+        return
+      }
+      if (!(data as { success: boolean }).success) {
+        showMsg('info', '이미 오늘 출석 처리되었습니다.')
         return
       }
       if (isBirthdayThisWeek(member.birth_date)) {
@@ -94,10 +94,8 @@ export default function CheckIn() {
     const today = todayString()
     setLoading(true)
     try {
-      const { data: existing } = await supabase.from('visitors').select('count').eq('date', today).maybeSingle()
-      const newCount = (existing?.count ?? 0) + 1
-      const { error } = await supabase.from('visitors').upsert({ date: today, count: newCount }, { onConflict: 'date' })
-      if (error) {
+      const { data, error } = await supabase.rpc('record_visitor', { p_date: today })
+      if (error || !(data as { success: boolean } | null)?.success) {
         showMsg('error', '방문자 출석에 실패했습니다.')
         return
       }
@@ -118,25 +116,15 @@ export default function CheckIn() {
     setMatches([])
     setShowVisitor(false)
     try {
-      const [{ data: memberData, error: err1 }, { data: pastoralData, error: err2 }] = await Promise.all([
-        supabase.from('members').select('id, name, phone, birth_date').ilike('phone', `%${fourDigits}`),
-        supabase.from('pastoral_team').select('id, name, phone, role, birth_date').ilike('phone', `%${fourDigits}`),
-      ])
+      const { data, error } = await supabase.rpc('search_members_by_phone_suffix', { suffix: fourDigits })
 
-      if (err1 || err2) {
+      if (error) {
         showMsg('error', '조회에 실패했습니다.')
         return
       }
-      const list: AnyMember[] = [
-        ...((memberData ?? []) as { id: string; name: string; phone: string; birth_date: string | null }[]).map((m) => ({
-          ...m,
-          source: 'member' as const,
-        })),
-        ...((pastoralData ?? []) as { id: string; name: string; phone: string; role: string | null; birth_date: string | null }[]).map((m) => ({
-          ...m,
-          source: 'pastoral' as const,
-        })),
-      ]
+      const list: AnyMember[] = ((data ?? []) as Array<{
+        id: string; name: string; phone: string; birth_date: string | null; source: string; role: string | null
+      }>).map(row => ({ ...row, source: row.source as 'member' | 'pastoral' }))
       if (list.length === 0) {
         setShowVisitor(true)
       } else if (list.length === 1) {
@@ -171,7 +159,7 @@ export default function CheckIn() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col items-center justify-center p-6 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col items-center justify-center p-6 sm:p-8" style={{ zoom: 1.7 }}>
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">출석 체크</h1>
       <p className="text-slate-600 text-xl mb-4">전화번호 뒷 4자리를 입력하세요</p>
 
