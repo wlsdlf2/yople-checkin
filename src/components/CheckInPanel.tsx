@@ -24,6 +24,7 @@ type CheckInPanelProps = {
   compact?: boolean
   topSlot?: ReactNode
   onMemberCheckedIn?: (member: AnyMember) => Promise<string | void>
+  birthdayCheck?: 'week' | 'day'
 }
 
 function isBirthdayThisWeek(birthDate: string | null): boolean {
@@ -41,13 +42,20 @@ function isBirthdayThisWeek(birthDate: string | null): boolean {
   return false
 }
 
+function isBirthdayToday(birthDate: string | null): boolean {
+  if (!birthDate) return false
+  const today = new Date()
+  const [, bMonth, bDay] = birthDate.split('-').map(Number)
+  return today.getMonth() + 1 === bMonth && today.getDate() === bDay
+}
+
 function todayString(): string {
   // KST(UTC+9) 기준 날짜 반환 — toISOString()은 UTC 기준이라 자정 전후 날짜가 어긋남
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
   return kst.toISOString().slice(0, 10)
 }
 
-export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onMemberCheckedIn }: CheckInPanelProps) {
+export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onMemberCheckedIn, birthdayCheck = 'week' }: CheckInPanelProps) {
   const [digits, setDigits] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [matches, setMatches] = useState<AnyMember[]>([])
@@ -85,7 +93,8 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
         showMsg('info', '이미 오늘 출석 처리되었습니다.')
         return
       }
-      if (isBirthdayThisWeek(member.birth_date)) {
+      const isBirthday = birthdayCheck === 'day' ? isBirthdayToday(member.birth_date) : isBirthdayThisWeek(member.birth_date)
+      if (isBirthday) {
         triggerCelebrationConfetti()
         showMsg('success', `🎂 ${member.name}님, 생일 축하해요! 출석 완료`)
       } else {
@@ -98,7 +107,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
     } catch {
       showMsg('error', '출석 처리에 실패했습니다.')
     }
-  }, [showMsg, onMemberCheckedIn])
+  }, [showMsg, onMemberCheckedIn, birthdayCheck])
 
   const recordVisitor = useCallback(async () => {
     const today = todayString()

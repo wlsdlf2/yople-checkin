@@ -65,6 +65,7 @@ export default function DawnPrayerCheckIn({ onBack }: Props) {
       compact
       topSlot={<AttendanceGauge current={attendanceCount} max={GAUGE_MAX} milestones={MILESTONES} />}
       onMemberCheckedIn={handleMemberCheckedIn}
+      birthdayCheck="day"
     />
   )
 }
