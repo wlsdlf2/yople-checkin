@@ -10,6 +10,7 @@ type AppState = 'loading' | 'locked' | 'select' | 'sunday' | 'dawn-prayer'
 function App() {
   const [appState, setAppState] = useState<AppState>('loading')
   const [passwordHash, setPasswordHash] = useState('')
+  const [dawnPrayerEnabled, setDawnPrayerEnabled] = useState(true)
 
   useEffect(() => {
     const init = async () => {
@@ -25,11 +26,14 @@ function App() {
         map[row.key] = row.value
       }
 
+      const dawnEnabled = map['dawn_prayer_enabled'] !== 'false'
+      setDawnPrayerEnabled(dawnEnabled)
+
       if (map['lock_enabled'] === 'true' && map['lock_password_hash']) {
         setPasswordHash(map['lock_password_hash'])
         setAppState('locked')
       } else {
-        setAppState('select')
+        setAppState(dawnEnabled ? 'select' : 'sunday')
       }
     }
     init()
@@ -47,13 +51,13 @@ function App() {
     return (
       <LockScreen
         passwordHash={passwordHash}
-        onUnlock={() => setAppState('select')}
+        onUnlock={() => setAppState(dawnPrayerEnabled ? 'select' : 'sunday')}
       />
     )
   }
 
   if (appState === 'sunday') {
-    return <CheckIn onBack={() => setAppState('select')} />
+    return <CheckIn onBack={dawnPrayerEnabled ? () => setAppState('select') : undefined} />
   }
 
   if (appState === 'dawn-prayer') {
