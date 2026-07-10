@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CheckInPanel } from '../components/CheckInPanel'
+import { CheckInPanel, type AnyMember } from '../components/CheckInPanel'
 import { AttendanceGauge } from '../components/AttendanceGauge'
 import { supabase } from '../lib/supabase'
 
@@ -29,11 +29,19 @@ export default function DawnPrayerCheckIn({ onBack }: Props) {
     })
     if (!error && typeof data === 'number') {
       setAttendanceCount(data)
+      return data
     }
+    return null
   }, [])
 
   useEffect(() => {
     fetchCount()
+  }, [fetchCount])
+
+  const handleMemberCheckedIn = useCallback(async (member: AnyMember) => {
+    const count = await fetchCount()
+    if (count == null) return undefined
+    return `${member.name}님까지 새벽기도회에 ${count}명이 출석했어요!`
   }, [fetchCount])
 
   return (
@@ -44,7 +52,7 @@ export default function DawnPrayerCheckIn({ onBack }: Props) {
       onBack={onBack}
       compact
       topSlot={<AttendanceGauge current={attendanceCount} max={GAUGE_MAX} milestones={MILESTONES} />}
-      onAttendanceRecorded={fetchCount}
+      onMemberCheckedIn={handleMemberCheckedIn}
     />
   )
 }

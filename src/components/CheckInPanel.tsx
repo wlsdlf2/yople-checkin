@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti'
 import { Keypad } from './Keypad'
 import { supabase } from '../lib/supabase'
 
-type AnyMember = {
+export type AnyMember = {
   id: string
   name: string
   phone: string
@@ -23,7 +23,7 @@ type CheckInPanelProps = {
   onBack?: () => void
   compact?: boolean
   topSlot?: ReactNode
-  onAttendanceRecorded?: () => void
+  onMemberCheckedIn?: (member: AnyMember) => Promise<string | void>
 }
 
 function isBirthdayThisWeek(birthDate: string | null): boolean {
@@ -52,7 +52,7 @@ function todayString(): string {
   return kst.toISOString().slice(0, 10)
 }
 
-export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onAttendanceRecorded }: CheckInPanelProps) {
+export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onMemberCheckedIn }: CheckInPanelProps) {
   const [digits, setDigits] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [matches, setMatches] = useState<AnyMember[]>([])
@@ -94,16 +94,16 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
         triggerBirthdayConfetti()
         showMsg('success', `🎂 ${member.name}님, 생일 축하해요! 출석 완료`)
       } else {
-        showMsg('success', `${member.name}님 출석 완료`)
+        const custom = member.source === 'member' ? await onMemberCheckedIn?.(member) : undefined
+        showMsg('success', custom || `${member.name}님 출석 완료`)
       }
       setMatches([])
       setDigits('')
       setShowVisitor(false)
-      onAttendanceRecorded?.()
     } catch {
       showMsg('error', '출석 처리에 실패했습니다.')
     }
-  }, [showMsg, onAttendanceRecorded])
+  }, [showMsg, onMemberCheckedIn])
 
   const recordVisitor = useCallback(async () => {
     const today = todayString()
@@ -118,13 +118,12 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
       setDigits('')
       setMatches([])
       setShowVisitor(false)
-      onAttendanceRecorded?.()
     } catch {
       showMsg('error', '방문자 출석에 실패했습니다.')
     } finally {
       setLoading(false)
     }
-  }, [showMsg, onAttendanceRecorded])
+  }, [showMsg])
 
   const searchMembers = useCallback(async (fourDigits: string) => {
     if (fourDigits.length !== 4) return
