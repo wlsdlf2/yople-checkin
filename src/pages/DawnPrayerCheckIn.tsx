@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckInPanel, type AnyMember } from '../components/CheckInPanel'
 import { AttendanceGauge } from '../components/AttendanceGauge'
 import { supabase } from '../lib/supabase'
+import { triggerCelebrationConfetti } from '../lib/confetti'
 
 // 2026년 7월 특별새벽기도회 기간 — yople-admin의 DAWN_PRAYER_DATES와 동일하게 유지
 const DAWN_PRAYER_START = '2026-07-13'
@@ -21,6 +22,7 @@ type Props = {
 
 export default function DawnPrayerCheckIn({ onBack }: Props) {
   const [attendanceCount, setAttendanceCount] = useState(0)
+  const prevCountRef = useRef(0)
 
   const fetchCount = useCallback(async () => {
     const { data, error } = await supabase.rpc('get_dawn_prayer_attendance_count', {
@@ -35,13 +37,23 @@ export default function DawnPrayerCheckIn({ onBack }: Props) {
   }, [])
 
   useEffect(() => {
-    fetchCount()
+    fetchCount().then((count) => {
+      if (count != null) prevCountRef.current = count
+    })
   }, [fetchCount])
 
   const handleMemberCheckedIn = useCallback(async (member: AnyMember) => {
-    const count = await fetchCount()
-    if (count == null) return undefined
-    return `${member.name}님까지 새벽기도회에 ${count}명이 출석했어요!`
+    const prevCount = prevCountRef.current
+    const newCount = await fetchCount()
+    if (newCount == null) return undefined
+    prevCountRef.current = newCount
+
+    const milestone = MILESTONES.find((m) => prevCount < m.value && newCount >= m.value)
+    if (milestone) {
+      triggerCelebrationConfetti()
+      return `${member.name}님 출석 완료\n🎉새벽기도회 ${milestone.value}명 출석 달성!`
+    }
+    return `${member.name}님까지 새벽기도회에 ${newCount}명이 출석했어요!`
   }, [fetchCount])
 
   return (

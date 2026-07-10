@@ -1,7 +1,7 @@
 import { useState, useCallback, type ReactNode } from 'react'
-import confetti from 'canvas-confetti'
 import { Keypad } from './Keypad'
 import { supabase } from '../lib/supabase'
+import { triggerCelebrationConfetti } from '../lib/confetti'
 
 export type AnyMember = {
   id: string
@@ -39,11 +39,6 @@ function isBirthdayThisWeek(birthDate: string | null): boolean {
     if (d.getMonth() + 1 === bMonth && d.getDate() === bDay) return true
   }
   return false
-}
-
-function triggerBirthdayConfetti() {
-  confetti({ particleCount: 100, angle: 45, spread: 40, origin: { x: 0.1, y: 0.75 }, startVelocity: 45 })
-  confetti({ particleCount: 100, angle: 135, spread: 40, origin: { x: 0.9, y: 0.75 }, startVelocity: 45 })
 }
 
 function todayString(): string {
@@ -91,7 +86,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
         return
       }
       if (isBirthdayThisWeek(member.birth_date)) {
-        triggerBirthdayConfetti()
+        triggerCelebrationConfetti()
         showMsg('success', `🎂 ${member.name}님, 생일 축하해요! 출석 완료`)
       } else {
         const custom = member.source === 'member' ? await onMemberCheckedIn?.(member) : undefined
@@ -217,7 +212,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
 
           {message && !showVisitor && (
             <p
-              className={`text-center text-lg font-medium mt-4 mb-1 rounded-xl py-3 px-4 ${
+              className={`text-center text-lg font-medium mt-4 mb-1 rounded-xl py-3 px-4 whitespace-pre-line ${
                 message.type === 'success'
                   ? 'bg-green-100 text-primary-dark'
                   : message.type === 'error'
