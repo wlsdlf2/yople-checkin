@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import CheckIn from './pages/CheckIn'
+import DawnPrayerCheckIn from './pages/DawnPrayerCheckIn'
+import Landing from './pages/Landing'
 import LockScreen from './pages/LockScreen'
 import { supabase } from './lib/supabase'
 
-type AppState = 'loading' | 'locked' | 'unlocked'
+type AppState = 'loading' | 'locked' | 'select' | 'sunday' | 'dawn-prayer'
 
 function App() {
   const [appState, setAppState] = useState<AppState>('loading')
@@ -14,7 +16,7 @@ function App() {
       const { data, error } = await supabase.rpc('get_kiosk_settings')
 
       if (error || !data) {
-        setAppState('unlocked')
+        setAppState('select')
         return
       }
 
@@ -27,7 +29,7 @@ function App() {
         setPasswordHash(map['lock_password_hash'])
         setAppState('locked')
       } else {
-        setAppState('unlocked')
+        setAppState('select')
       }
     }
     init()
@@ -45,12 +47,25 @@ function App() {
     return (
       <LockScreen
         passwordHash={passwordHash}
-        onUnlock={() => setAppState('unlocked')}
+        onUnlock={() => setAppState('select')}
       />
     )
   }
 
-  return <CheckIn />
+  if (appState === 'sunday') {
+    return <CheckIn onBack={() => setAppState('select')} />
+  }
+
+  if (appState === 'dawn-prayer') {
+    return <DawnPrayerCheckIn onBack={() => setAppState('select')} />
+  }
+
+  return (
+    <Landing
+      onSelectSunday={() => setAppState('sunday')}
+      onSelectDawnPrayer={() => setAppState('dawn-prayer')}
+    />
+  )
 }
 
 export default App

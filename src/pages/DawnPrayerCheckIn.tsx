@@ -4,12 +4,12 @@ type Props = {
   onBack?: () => void
 }
 
-export default function CheckIn({ onBack }: Props) {
+export default function DawnPrayerCheckIn({ onBack }: Props) {
   return (
     <CheckInPanel
-      heading="출석 체크"
+      heading="새벽기도회 출석체크"
       subheading="전화번호 뒷 4자리를 입력하세요"
-      background={{ type: 'gradient' }}
+      background={{ type: 'image', src: '/특새배경.png' }}
       onBack={onBack}
     />
   )
