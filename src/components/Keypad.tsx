@@ -4,6 +4,7 @@ type KeypadProps = {
   maxLength?: number
   disabled?: boolean
   onReset?: () => void
+  size?: 'default' | 'compact'
 }
 
 const ROW1 = [
@@ -36,7 +37,12 @@ function BackspaceIcon() {
   )
 }
 
-export function Keypad({ value, onChange, maxLength = 4, disabled = false, onReset }: KeypadProps) {
+export function Keypad({ value, onChange, maxLength = 4, disabled = false, onReset, size = 'default' }: KeypadProps) {
+  const isCompact = size === 'compact'
+  const keyHeight = isCompact ? 'min-h-[56px] sm:min-h-[64px]' : 'min-h-[80px] sm:min-h-[88px]'
+  const digitTextSize = isCompact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'
+  const containerPadding = isCompact ? 'p-2 sm:p-3 gap-2' : 'p-3 sm:p-4 gap-3'
+
   const handleDigit = (digit: string) => {
     if (disabled || value.length >= maxLength) return
     onChange(value + digit)
@@ -52,57 +58,57 @@ export function Keypad({ value, onChange, maxLength = 4, disabled = false, onRes
       type="button"
       disabled={disabled}
       onClick={() => handleDigit(item.digit)}
-      className="min-h-[80px] sm:min-h-[88px] w-full rounded-2xl bg-white text-slate-800 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex flex-col items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50"
+      className={`${keyHeight} w-full rounded-2xl bg-white text-slate-800 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex flex-col items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50`}
     >
-      <span className="text-3xl sm:text-4xl font-semibold leading-none">{item.digit}</span>
+      <span className={`${digitTextSize} font-semibold leading-none`}>{item.digit}</span>
     </button>
   )
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-gray-200 rounded-3xl p-3 sm:p-4 gap-3 grid grid-cols-3">
+    <div className={`w-full max-w-sm mx-auto bg-gray-200 rounded-3xl grid grid-cols-3 ${containerPadding}`}>
       {ROW1.map((item) => (
-        <div key={item.digit} className="min-h-[80px] sm:min-h-[88px]">
+        <div key={item.digit} className={keyHeight}>
           {renderDigitKey(item)}
         </div>
       ))}
       {ROW2.map((item) => (
-        <div key={item.digit} className="min-h-[80px] sm:min-h-[88px]">
+        <div key={item.digit} className={keyHeight}>
           {renderDigitKey(item)}
         </div>
       ))}
       {ROW3.map((item) => (
-        <div key={item.digit} className="min-h-[80px] sm:min-h-[88px]">
+        <div key={item.digit} className={keyHeight}>
           {renderDigitKey(item)}
         </div>
       ))}
       {/* Row 4: 초기화 | 0 | 삭제 */}
-      <div className="min-h-[80px] sm:min-h-[88px]">
+      <div className={keyHeight}>
         <button
           type="button"
           disabled={disabled || !onReset}
           onClick={onReset}
-          className="min-h-[80px] sm:min-h-[88px] w-full rounded-2xl bg-white text-slate-600 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50 text-sm sm:text-base font-medium"
+          className={`${keyHeight} w-full rounded-2xl bg-white text-slate-600 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50 text-sm sm:text-base font-medium`}
           aria-label="초기화"
         >
           초기화
         </button>
       </div>
-      <div className="min-h-[80px] sm:min-h-[88px]">
+      <div className={keyHeight}>
         <button
           type="button"
           disabled={disabled}
           onClick={() => handleDigit('0')}
-          className="min-h-[80px] sm:min-h-[88px] w-full rounded-2xl bg-white text-slate-800 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex flex-col items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50"
+          className={`${keyHeight} w-full rounded-2xl bg-white text-slate-800 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex flex-col items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50`}
         >
-          <span className="text-3xl sm:text-4xl font-semibold leading-none">0</span>
+          <span className={`${digitTextSize} font-semibold leading-none`}>0</span>
         </button>
       </div>
-      <div className="min-h-[80px] sm:min-h-[88px]">
+      <div className={keyHeight}>
         <button
           type="button"
           disabled={disabled}
           onClick={handleBackspace}
-          className="min-h-[80px] sm:min-h-[88px] w-full rounded-2xl bg-white text-slate-700 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50"
+          className={`${keyHeight} w-full rounded-2xl bg-white text-slate-700 shadow-[0_2px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 flex items-center justify-center select-none touch-manipulation active:scale-[0.97] disabled:opacity-50 hover:bg-slate-50`}
           aria-label="삭제"
         >
           <BackspaceIcon />

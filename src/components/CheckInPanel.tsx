@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, type ReactNode } from 'react'
 import confetti from 'canvas-confetti'
 import { Keypad } from './Keypad'
 import { supabase } from '../lib/supabase'
@@ -21,6 +21,9 @@ type CheckInPanelProps = {
   subheading: string
   background: BackgroundConfig
   onBack?: () => void
+  compact?: boolean
+  topSlot?: ReactNode
+  onAttendanceRecorded?: () => void
 }
 
 function isBirthdayThisWeek(birthDate: string | null): boolean {
@@ -49,7 +52,7 @@ function todayString(): string {
   return kst.toISOString().slice(0, 10)
 }
 
-export function CheckInPanel({ heading, subheading, background, onBack }: CheckInPanelProps) {
+export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onAttendanceRecorded }: CheckInPanelProps) {
   const [digits, setDigits] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [matches, setMatches] = useState<AnyMember[]>([])
@@ -96,10 +99,11 @@ export function CheckInPanel({ heading, subheading, background, onBack }: CheckI
       setMatches([])
       setDigits('')
       setShowVisitor(false)
+      onAttendanceRecorded?.()
     } catch {
       showMsg('error', '출석 처리에 실패했습니다.')
     }
-  }, [showMsg])
+  }, [showMsg, onAttendanceRecorded])
 
   const recordVisitor = useCallback(async () => {
     const today = todayString()
@@ -114,12 +118,13 @@ export function CheckInPanel({ heading, subheading, background, onBack }: CheckI
       setDigits('')
       setMatches([])
       setShowVisitor(false)
+      onAttendanceRecorded?.()
     } catch {
       showMsg('error', '방문자 출석에 실패했습니다.')
     } finally {
       setLoading(false)
     }
-  }, [showMsg])
+  }, [showMsg, onAttendanceRecorded])
 
   const searchMembers = useCallback(async (fourDigits: string) => {
     if (fourDigits.length !== 4) return
@@ -170,6 +175,10 @@ export function CheckInPanel({ heading, subheading, background, onBack }: CheckI
   }, [])
 
   const isImageBg = background.type === 'image'
+  const cardPadding = compact ? 'p-4 sm:p-5' : 'p-6 sm:p-8'
+  const headingSize = compact ? 'text-xl sm:text-2xl mb-1' : 'text-2xl sm:text-3xl mb-2'
+  const subheadingSize = compact ? 'text-sm sm:text-base mb-2' : 'text-xl mb-4'
+  const digitsBoxSize = compact ? 'h-12 sm:h-14 text-xl sm:text-2xl' : 'h-16 sm:h-20 text-2xl sm:text-3xl'
 
   return (
     <div
@@ -188,12 +197,18 @@ export function CheckInPanel({ heading, subheading, background, onBack }: CheckI
         </button>
       )}
 
-      <div className={isImageBg ? 'w-full max-w-sm rounded-3xl bg-white/90 backdrop-blur-sm shadow-xl p-6 sm:p-8 flex flex-col items-center' : 'flex flex-col items-center'}>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 text-center">{heading}</h1>
-        <p className="text-slate-600 text-xl mb-4 text-center">{subheading}</p>
+      {topSlot && (
+        <div className="w-full flex justify-center mb-4 sm:mb-6">
+          {topSlot}
+        </div>
+      )}
+
+      <div className={isImageBg ? `w-full max-w-sm rounded-3xl bg-white/90 backdrop-blur-sm shadow-xl ${cardPadding} flex flex-col items-center` : 'flex flex-col items-center'}>
+        <h1 className={`${headingSize} font-bold text-slate-800 text-center`}>{heading}</h1>
+        <p className={`${subheadingSize} text-slate-600 text-center`}>{subheading}</p>
 
         <div className="w-full max-w-sm mb-3 sm:mb-4">
-          <div className="h-16 sm:h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 text-2xl sm:text-3xl font-mono mb-0">
+          <div className={`${digitsBoxSize} rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 font-mono mb-0`}>
             {Array.from({ length: 4 }, (_, i) => (
               <span key={i} className={digits[i] ? 'text-slate-800' : 'text-slate-300'}>
                 {digits[i] ?? '_'}
@@ -263,7 +278,14 @@ export function CheckInPanel({ heading, subheading, background, onBack }: CheckI
           )}
         </div>
 
-        <Keypad value={digits} onChange={handleDigitsChange} maxLength={4} disabled={loading} onReset={handleReset} />
+        <Keypad
+          value={digits}
+          onChange={handleDigitsChange}
+          maxLength={4}
+          disabled={loading}
+          onReset={handleReset}
+          size={compact ? 'compact' : 'default'}
+        />
       </div>
     </div>
   )

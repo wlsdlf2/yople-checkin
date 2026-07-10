@@ -21,7 +21,7 @@ export default function Landing({ onSelectSunday, onSelectDawnPrayer }: Props) {
         onClick={onSelectDawnPrayer}
         className="w-full max-w-sm min-h-[88px] rounded-2xl bg-primary text-white text-xl font-semibold shadow-sm hover:bg-primary-dark active:scale-[0.99]"
       >
-        특별새벽기도회 출석체크
+        새벽기도회 출석체크
       </button>
     </div>
   )
