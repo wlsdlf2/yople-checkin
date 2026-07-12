@@ -62,7 +62,6 @@ export default function DawnPrayerCheckIn({ onBack }: Props) {
       subheading="전화번호 뒷 4자리를 입력하세요"
       background={{ type: 'image', src: '/특새배경.png' }}
       onBack={onBack}
-      compact
       topSlot={<AttendanceGauge current={attendanceCount} max={GAUGE_MAX} milestones={MILESTONES} />}
       onMemberCheckedIn={handleMemberCheckedIn}
       birthdayCheck="day"

@@ -21,7 +21,6 @@ type CheckInPanelProps = {
   subheading: string
   background: BackgroundConfig
   onBack?: () => void
-  compact?: boolean
   topSlot?: ReactNode
   onMemberCheckedIn?: (member: AnyMember) => Promise<string | void>
   birthdayCheck?: 'week' | 'day'
@@ -55,7 +54,7 @@ function todayString(): string {
   return kst.toISOString().slice(0, 10)
 }
 
-export function CheckInPanel({ heading, subheading, background, onBack, compact = false, topSlot, onMemberCheckedIn, birthdayCheck = 'week' }: CheckInPanelProps) {
+export function CheckInPanel({ heading, subheading, background, onBack, topSlot, onMemberCheckedIn, birthdayCheck = 'week' }: CheckInPanelProps) {
   const [digits, setDigits] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [matches, setMatches] = useState<AnyMember[]>([])
@@ -178,17 +177,17 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
   }, [])
 
   const isImageBg = background.type === 'image'
-  const cardPadding = compact ? 'p-4 sm:p-5' : 'p-6 sm:p-8'
-  const headingSize = compact ? 'text-xl sm:text-2xl mb-1' : 'text-2xl sm:text-3xl mb-2'
-  const subheadingSize = compact ? 'text-sm sm:text-base mb-2' : 'text-xl mb-4'
-  const digitsBoxSize = compact ? 'h-12 sm:h-14 text-xl sm:text-2xl' : 'h-16 sm:h-20 text-2xl sm:text-3xl'
+  const cardPadding = 'p-4 sm:p-5'
+  const headingSize = 'text-xl sm:text-2xl mb-1'
+  const subheadingSize = 'text-sm sm:text-base mb-2'
+  const digitsBoxSize = 'h-12 sm:h-14 text-xl sm:text-2xl'
 
   return (
     <div
       className={`min-h-screen flex flex-col items-center justify-center p-6 sm:p-8 ${
         isImageBg ? 'bg-cover bg-center' : 'bg-gradient-to-b from-slate-50 to-slate-100'
       }`}
-      style={isImageBg ? { backgroundImage: `url(${(background as { src: string }).src})`, zoom: 1.0 } : { zoom: 1.0 }}
+      style={isImageBg ? { backgroundImage: `url(${(background as { src: string }).src})` } : undefined}
     >
       {onBack && (
         <button
@@ -287,7 +286,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, compact 
           maxLength={4}
           disabled={loading}
           onReset={handleReset}
-          size={compact ? 'compact' : 'default'}
+          size="compact"
         />
       </div>
     </div>
