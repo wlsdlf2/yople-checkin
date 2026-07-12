@@ -39,7 +39,7 @@ function BackspaceIcon() {
 
 export function Keypad({ value, onChange, maxLength = 4, disabled = false, onReset, size = 'default' }: KeypadProps) {
   const isCompact = size === 'compact'
-  const keyHeight = isCompact ? 'min-h-[68px] sm:min-h-[80px]' : 'min-h-[80px] sm:min-h-[88px]'
+  const keyHeight = isCompact ? 'min-h-[76px] sm:min-h-[88px]' : 'min-h-[80px] sm:min-h-[88px]'
   const digitTextSize = isCompact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'
   const containerPadding = isCompact ? 'p-3 sm:p-4 gap-2.5' : 'p-3 sm:p-4 gap-3'
   const containerMaxWidth = isCompact ? 'max-w-sm sm:max-w-md' : 'max-w-sm'

@@ -177,10 +177,10 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
   }, [])
 
   const isImageBg = background.type === 'image'
-  const cardPadding = 'px-5 py-6 sm:px-6 sm:py-8'
+  const cardPadding = 'px-5 py-7 sm:px-6 sm:py-9'
   const headingSize = 'text-xl sm:text-2xl mb-1'
   const subheadingSize = 'text-sm sm:text-base mb-2'
-  const digitsBoxSize = 'h-14 sm:h-16 text-xl sm:text-2xl'
+  const digitsBoxSize = 'h-16 sm:h-20 text-xl sm:text-2xl'
 
   return (
     <div
