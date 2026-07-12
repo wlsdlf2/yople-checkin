@@ -200,7 +200,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
       )}
 
       {topSlot && (
-        <div className="w-full flex justify-center mb-4 sm:mb-6">
+        <div className="w-full flex justify-center  mt-4 sm:mt-6 mb-4 sm:mb-6">
           {topSlot}
         </div>
       )}
