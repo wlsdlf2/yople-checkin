@@ -13,7 +13,7 @@ export function AttendanceGauge({ current, max, milestones }: AttendanceGaugePro
   const pct = Math.min(100, (current / max) * 100)
 
   return (
-    <div className="w-full max-w-xl bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl p-4 sm:p-5">
+    <div className="w-full max-w-2xl bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl p-4 sm:p-5">
       <div className="flex items-baseline justify-between mb-1.5">
         <span className="text-xs font-semibold text-slate-500">누적 출석 인원</span>
         <span className="text-sm font-bold text-primary-dark">
