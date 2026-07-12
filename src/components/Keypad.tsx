@@ -39,9 +39,10 @@ function BackspaceIcon() {
 
 export function Keypad({ value, onChange, maxLength = 4, disabled = false, onReset, size = 'default' }: KeypadProps) {
   const isCompact = size === 'compact'
-  const keyHeight = isCompact ? 'min-h-[56px] sm:min-h-[64px]' : 'min-h-[80px] sm:min-h-[88px]'
+  const keyHeight = isCompact ? 'min-h-[68px] sm:min-h-[80px]' : 'min-h-[80px] sm:min-h-[88px]'
   const digitTextSize = isCompact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'
-  const containerPadding = isCompact ? 'p-2 sm:p-3 gap-2' : 'p-3 sm:p-4 gap-3'
+  const containerPadding = isCompact ? 'p-3 sm:p-4 gap-2.5' : 'p-3 sm:p-4 gap-3'
+  const containerMaxWidth = isCompact ? 'max-w-sm sm:max-w-md' : 'max-w-sm'
 
   const handleDigit = (digit: string) => {
     if (disabled || value.length >= maxLength) return
@@ -65,7 +66,7 @@ export function Keypad({ value, onChange, maxLength = 4, disabled = false, onRes
   )
 
   return (
-    <div className={`w-full max-w-sm mx-auto bg-gray-200 rounded-3xl grid grid-cols-3 ${containerPadding}`}>
+    <div className={`w-full ${containerMaxWidth} mx-auto bg-gray-200 rounded-3xl grid grid-cols-3 ${containerPadding}`}>
       {ROW1.map((item) => (
         <div key={item.digit} className={keyHeight}>
           {renderDigitKey(item)}

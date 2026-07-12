@@ -177,14 +177,14 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
   }, [])
 
   const isImageBg = background.type === 'image'
-  const cardPadding = 'p-4 sm:p-5'
+  const cardPadding = 'p-5 sm:p-6'
   const headingSize = 'text-xl sm:text-2xl mb-1'
   const subheadingSize = 'text-sm sm:text-base mb-2'
-  const digitsBoxSize = 'h-12 sm:h-14 text-xl sm:text-2xl'
+  const digitsBoxSize = 'h-14 sm:h-16 text-xl sm:text-2xl'
 
   return (
     <div
-      className={`min-h-screen flex flex-col items-center justify-center p-6 sm:p-8 ${
+      className={`min-h-screen flex flex-col items-center justify-start pt-8 sm:pt-12 px-6 sm:px-8 pb-6 sm:pb-8 ${
         isImageBg ? 'bg-cover bg-center' : 'bg-gradient-to-b from-slate-50 to-slate-100'
       }`}
       style={isImageBg ? { backgroundImage: `url(${(background as { src: string }).src})` } : undefined}
@@ -205,11 +205,11 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
         </div>
       )}
 
-      <div className={isImageBg ? `w-full max-w-sm rounded-3xl bg-white/90 backdrop-blur-sm shadow-xl ${cardPadding} flex flex-col items-center` : 'flex flex-col items-center'}>
+      <div className={isImageBg ? `w-full max-w-sm sm:max-w-md rounded-3xl bg-white/90 backdrop-blur-sm shadow-xl ${cardPadding} flex flex-col items-center` : 'flex flex-col items-center'}>
         <h1 className={`${headingSize} font-bold text-slate-800 text-center`}>{heading}</h1>
         <p className={`${subheadingSize} text-slate-600 text-center`}>{subheading}</p>
 
-        <div className="w-full max-w-sm mb-3 sm:mb-4">
+        <div className="w-full max-w-sm sm:max-w-md mb-3 sm:mb-4">
           <div className={`${digitsBoxSize} rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-4 font-mono mb-0`}>
             {Array.from({ length: 4 }, (_, i) => (
               <span key={i} className={digits[i] ? 'text-slate-800' : 'text-slate-300'}>
