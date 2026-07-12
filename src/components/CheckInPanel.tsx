@@ -177,7 +177,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
   }, [])
 
   const isImageBg = background.type === 'image'
-  const cardPadding = 'p-5 sm:p-6'
+  const cardPadding = 'px-5 py-6 sm:px-6 sm:py-8'
   const headingSize = 'text-xl sm:text-2xl mb-1'
   const subheadingSize = 'text-sm sm:text-base mb-2'
   const digitsBoxSize = 'h-14 sm:h-16 text-xl sm:text-2xl'
@@ -200,7 +200,7 @@ export function CheckInPanel({ heading, subheading, background, onBack, topSlot,
       )}
 
       {topSlot && (
-        <div className="w-full flex justify-center  mt-4 sm:mt-6 mb-4 sm:mb-6">
+        <div className="w-full flex justify-center  mt-4 sm:mt-6 mb-6 sm:mb-8">
           {topSlot}
         </div>
       )}
