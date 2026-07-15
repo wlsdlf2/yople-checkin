@@ -8,12 +8,12 @@ import { triggerCelebrationConfetti } from '../lib/confetti'
 const DAWN_PRAYER_START = '2026-07-13'
 const DAWN_PRAYER_END = '2026-07-17'
 
-const GAUGE_MAX = 250
+const GAUGE_MAX = 170
 const MILESTONES = [
-  { value: 150, label: '선물1' },
-  { value: 200, label: '선물2' },
-  { value: 230, label: '선물3' },
-  { value: 250, label: '선물4' },
+  { value: 100, label: '선물1' },
+  { value: 130, label: '선물2' },
+  { value: 150, label: '선물3' },
+  { value: 170, label: '선물4' },
 ]
 
 type Props = {
